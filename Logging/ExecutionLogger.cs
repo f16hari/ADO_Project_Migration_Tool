@@ -10,7 +10,7 @@ public class ExecutionLogger
 
     public ExecutionLogger(string loggingDirectory, long executinStep = 1)
     {
-        FilePath = Path.Combine(loggingDirectory, $"Execution_Logs_{DateTime.Now}.csv");
+        FilePath = Path.Combine(loggingDirectory, $"Execution_Logs_{DateTime.Now:ddMMyyyyHHMMss}.csv");
         ExecutionStep = executinStep;
 
         using StreamWriter writer = File.AppendText(FilePath);

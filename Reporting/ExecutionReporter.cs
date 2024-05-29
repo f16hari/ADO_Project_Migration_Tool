@@ -9,7 +9,7 @@ public class ExecutionReporter
 
     public ExecutionReporter(string reportingDirectory)
     {
-        FilePath = Path.Combine(reportingDirectory, $"Execution_Report_{DateTime.Now}.csv");
+        FilePath = Path.Combine(reportingDirectory, $"Execution_Report_{DateTime.Now:ddMMyyyyHHMMss}.csv");
 
         using StreamWriter writer = File.AppendText(FilePath);
         writer.WriteLine("workItemId, workItemType, areaPath, iterationPath");

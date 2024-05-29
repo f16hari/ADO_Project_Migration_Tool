@@ -58,11 +58,14 @@ public class Executor
             var workItem = WitClient.GetWorkItemAsync(workItemId).Result;
             Reporter.Add(workItem);
 
-            workItemTraverser.Traverse(workItemId, new Func<int, bool>(ShouldProcess), new Action<int>(travWorkItemId =>
+            if (Config.ShouldTraverseRelations)
             {
-                var travWorkItem = WitClient.GetWorkItemAsync(travWorkItemId).Result;
-                Reporter.Add(travWorkItem);
-            }));
+                workItemTraverser.Traverse(workItemId, new Func<int, bool>(ShouldProcess), new Action<int>(travWorkItemId =>
+                {
+                    var travWorkItem = WitClient.GetWorkItemAsync(travWorkItemId).Result;
+                    Reporter.Add(travWorkItem);
+                }));
+            }
 
             processedCount++;
             Console.WriteLine($"Processed {processedCount} / {Config.WorkItemIds.Count}", true);
@@ -71,7 +74,9 @@ public class Executor
 
     public void MoveWorkItems()
     {
+        WorkItemTraverser workItemTraverser = new(WitClient);
         int processedCount = 0;
+
         foreach (var workItemId in Config.WorkItemIds)
         {
             var workItem = WitClient.GetWorkItemAsync(workItemId).Result;
@@ -82,7 +87,6 @@ public class Executor
             // 2. Move realted WorkItem
             if (Config.ShouldTraverseRelations)
             {
-                WorkItemTraverser workItemTraverser = new(WitClient);
                 workItemTraverser.Traverse(workItemId, new Func<int, bool>(ShouldProcess), new Action<int>(MoveWorkItem));
             }
 

@@ -11,6 +11,8 @@ public class WorkItemTraverser(WorkItemTrackingHttpClient witClient)
         {
             var workItem = witClient.GetWorkItemAsync(workItemId, expand: WorkItemExpand.Relations).Result;
 
+            if(workItem.Relations == null) return;
+            
             foreach (var relatedWorkItem in workItem.Relations)
             {
                 var relatedWorkItemId = int.Parse(relatedWorkItem.Url.Split('/').Last());

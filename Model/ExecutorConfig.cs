@@ -9,11 +9,11 @@ public class ExecutorConfig(IConfiguration config)
     public string PersonalAcessToken { get; set; } = config.GetValue<string>("PersonalAcessToken") ?? throw new ArgumentNullException("PersonalAcessToken");
     public string SourceProject { get; set; } = config.GetValue<string>("SourceProject") ?? throw new ArgumentNullException("SourceProject");
     public string DestinationProject { get; set; } = config.GetValue<string>("DestinationProject") ?? throw new ArgumentNullException("DestinationProject");
-    public List<int> WorkItemIds { get; set; } = config.GetValue<List<int>>("WorkItemIds") ?? [];
+    public List<int> WorkItemIds { get; set; } = config.GetSection("WorkItemIds").Get<List<int>>() ?? [];
     public string WITQuery { get; set; } = config.GetValue<string>("WITQuery") ?? string.Empty;
-    public List<string> AreaPathsToIgnore { get; set; } = config.GetValue<List<string>>("AreaPathsToIgnore") ?? [];
-    public List<string> IterationPathsToIgnore { get; set; } = config.GetValue<List<string>>("IterationPathsToIgnore") ?? [];
-    public List<string> WorkItemTypesToIgnore { get; set; } = config.GetValue<List<string>>("WorkItemTypesToIgnore") ?? [];
+    public List<string> AreaPathsToIgnore { get; set; } = config.GetSection("AreaPathsToIgnore").Get<List<string>>() ?? [];
+    public List<string> IterationPathsToIgnore { get; set; } = config.GetSection("IterationPathsToIgnore").Get<List<string>>() ?? [];
+    public List<string> WorkItemTypesToIgnore { get; set; } = config.GetSection("WorkItemTypesToIgnore").Get<List<string>>() ?? [];
     public bool ShouldTraverseRelations { get; set; } = config.GetValue<bool>("ShouldTraverseRelations");
     public UserOperation Operation { get; set; } = (UserOperation)Enum.Parse(typeof(UserOperation), config.GetValue<string>("Operation") ?? throw new ArgumentNullException("Operation"));
     public long? RollBackToStep { get; set; } = config.GetValue<long>("RollBackToStep");
