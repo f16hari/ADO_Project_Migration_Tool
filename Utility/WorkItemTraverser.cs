@@ -5,7 +5,7 @@ namespace ADOMigration.Utilty;
 
 public class WorkItemTraverser(WorkItemTrackingHttpClient witClient)
 {
-    public void Traverse(int workItemId, Func<int, bool> shouldTraverse, Action<int> callBack)
+    public void Traverse(int workItemId, Func<int, bool> shouldProcess, Action<int> callBack)
     {
         try
         {
@@ -15,10 +15,10 @@ public class WorkItemTraverser(WorkItemTrackingHttpClient witClient)
             {
                 var relatedWorkItemId = int.Parse(relatedWorkItem.Url.Split('/').Last());
 
-                if(!shouldTraverse(relatedWorkItemId)) return;
+                if(!shouldProcess(relatedWorkItemId)) return;
 
                 callBack.Invoke(relatedWorkItemId);
-                Traverse(relatedWorkItemId, shouldTraverse, callBack);
+                Traverse(relatedWorkItemId, shouldProcess, callBack);
             }
         }
         catch (Exception ex)

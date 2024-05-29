@@ -8,11 +8,8 @@ public class ExecutionReporter
 {
     private string FilePath { get; }
 
-    public ExecutionReporter(IConfiguration config)
+    public ExecutionReporter(string reportingDirectory)
     {
-        string reportingDirectory = config.GetValue<string>("Reporting:Directory")
-                                  ?? throw new ArgumentNullException("Reporting:Directory");
-
         FilePath = Path.Combine(reportingDirectory, $"Execution_Report_{DateTime.Now}.csv");
 
         using StreamWriter writer = File.AppendText(FilePath);

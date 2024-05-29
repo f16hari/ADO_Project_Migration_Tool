@@ -13,30 +13,21 @@ namespace ADOMigration.Core;
 
 public class Executor
 {
-    public IConfiguration Configuration { get; set; }
+    public ExecutorConfig Config { get; set; }
     public WorkItemTrackingHttpClient WitClient { get; }
-    public List<int> WorkItemIds { get; }
-    public bool ShouldTraverseRelations { get; }
-    public string SourceProject { get; }
-    public string DestinationProject { get; }
     public ExecutionReporter Reporter { get; }
     public ExecutionLogger ExecutionLogger { get; }
 
     public Executor(IConfiguration config)
     {
-        Configuration = config;
-        ExecutionLogger = new ExecutionLogger(config);
-        Reporter = new ExecutionReporter(config);
+        Config = new(config);
+        ExecutionLogger = new ExecutionLogger(Config.LoggingDirectory);
+        Reporter = new ExecutionReporter(Config.ReportingDirectory);
 
-        var orgUrl = new Uri(config.GetValue<string>("Migration:OrgURL") ?? string.Empty);
-        var pat = config.GetValue<string>("Migration:PersonalAcessToken") ?? string.Empty;
 
-        SourceProject = config.GetValue<string>("Migration:SourceProject") ?? string.Empty;
-        DestinationProject = config.GetValue<string>("Migration:DestinationProject") ?? string.Empty;
-        WorkItemIds = (config.GetValue<string>("Migration:WorkItems") ?? string.Empty).Split(",").Select(int.Parse).ToList();
-        ShouldTraverseRelations = config.GetValue<bool>("Migration:ShouldTraverseRelations");
-
-        WitClient = new VssConnection(orgUrl, new VssBasicCredential(string.Empty, pat)).GetClient<WorkItemTrackingHttpClient>();
+        WitClient = new VssConnection(Config.OrgURL,
+                                      new VssBasicCredential(string.Empty, Config.PersonalAcessToken))
+                                      .GetClient<WorkItemTrackingHttpClient>();
     }
 
     public void Execute(UserOperation operation)
@@ -61,12 +52,12 @@ public class Executor
     {
         WorkItemTraverser workItemTraverser = new(WitClient);
 
-        foreach (var workItemId in WorkItemIds)
+        foreach (var workItemId in Config.WorkItemIds)
         {
             var workItem = WitClient.GetWorkItemAsync(workItemId).Result;
             Reporter.Add(workItem);
 
-            workItemTraverser.Traverse(workItemId, new Func<int, bool>(ShouldTraverse), new Action<int>(travWorkItemId =>
+            workItemTraverser.Traverse(workItemId, new Func<int, bool>(ShouldProcess), new Action<int>(travWorkItemId =>
             {
                 var travWorkItem = WitClient.GetWorkItemAsync(travWorkItemId).Result;
                 Reporter.Add(travWorkItem);
@@ -76,7 +67,7 @@ public class Executor
 
     public void MoveWorkItems()
     {
-        foreach (var workItemId in WorkItemIds)
+        foreach (var workItemId in Config.WorkItemIds)
         {
             var workItem = WitClient.GetWorkItemAsync(workItemId).Result;
 
@@ -84,8 +75,10 @@ public class Executor
             MoveWorkItem(workItemId);
 
             // 2. Move realted WorkItem
+            if (!Config.ShouldTraverseRelations) return;
+
             WorkItemTraverser workItemTraverser = new(WitClient);
-            workItemTraverser.Traverse(workItemId, new Func<int, bool>(ShouldTraverse), new Action<int>(MoveWorkItem));
+            workItemTraverser.Traverse(workItemId, new Func<int, bool>(ShouldProcess), new Action<int>(MoveWorkItem));
         }
     }
 
@@ -120,7 +113,7 @@ public class Executor
         // 2. Move WorkItem
         try
         {
-            var movedWorkItem = mover.MoveWorkItem(workItemId, SourceProject, DestinationProject);
+            var movedWorkItem = mover.MoveWorkItem(workItemId, Config.SourceProject, Config.DestinationProject);
             ExecutionLogger.Log(workItem,
                                 SystemOperation.MoveWorkItem,
                                 $"{workItem.TeamProject()};{workItem.AreaPath()};{workItem.IterationPath}",
@@ -138,7 +131,7 @@ public class Executor
         }
 
 
-        // 3. Restore the links
+        // 3. Restore the Test Artifact links
         try
         {
             if (removedRelations.Count == 0) return;
@@ -165,18 +158,17 @@ public class Executor
     {
         try
         {
-            var rollBackTillStep = Configuration.GetValue<int>("Migration:RollBackTillStep");
             RollBackHelper rollBackHelper = new(WitClient);
 
-            foreach(var line in File.ReadAllLines(Configuration.GetValue<string>("Logging:Directory")?? string.Empty).Reverse())
+            foreach (var line in File.ReadAllLines(Config.ReportingDirectory).Reverse())
             {
                 ExecutionLogEntry logEntry = new(line);
-                if(logEntry.ExecutionStep < rollBackTillStep) break;
+                if (logEntry.ExecutionStep < Config.RollBackToStep) break;
 
                 rollBackHelper.RollBack(logEntry.WorkItemId, logEntry.Operation, logEntry.PrevValue);
             }
 
-            Console.WriteLine($"Rollback till Step : {rollBackTillStep} completed");
+            Console.WriteLine($"Rollback till Step : {Config.RollBackToStep} completed");
         }
         catch (Exception ex)
         {
@@ -185,11 +177,15 @@ public class Executor
         }
     }
 
-    public bool ShouldTraverse(int workItemId)
+    private bool ShouldProcess(int workItemId)
     {
-        if (!ShouldTraverseRelations) return false;
-
         var workItem = WitClient.GetWorkItemAsync(workItemId).Result;
-        return workItem != null && workItem.Fields.Any(x => x.Key == "System.TeamProject" && x.Value.ToString() == SourceProject);
+
+        if (workItem.TeamProject() != Config.SourceProject
+            || Config.AreaPathsToIgnore.Contains(workItem.AreaPath())
+            || Config.IterationPathsToIgnore.Contains(workItem.IterationPath())
+            || Config.WorkItemTypesToIgnore.Contains(workItem.WorkItemType())) return false;
+
+        return true;
     }
 }

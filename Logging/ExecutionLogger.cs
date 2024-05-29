@@ -10,11 +10,8 @@ public class ExecutionLogger
     private string FilePath { get; }
     private long ExecutionStep { get; set; }
 
-    public ExecutionLogger(IConfiguration config, long executinStep = 1)
+    public ExecutionLogger(string loggingDirectory, long executinStep = 1)
     {
-        string loggingDirectory = config.GetValue<string>("Logging:Directory")
-                                  ?? throw new ArgumentNullException("Logging:Directory");
-
         FilePath = Path.Combine(loggingDirectory, $"Execution_Logs_{DateTime.Now}.csv");
         ExecutionStep = executinStep;
 
