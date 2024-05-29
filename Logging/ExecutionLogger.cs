@@ -1,6 +1,4 @@
-﻿using ADOMigration.Extensions;
-using ADOMigration.Model;
-using Microsoft.Extensions.Configuration;
+﻿using ADOMigration.Model;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
 namespace ADOMigration.Logging;

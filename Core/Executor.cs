@@ -51,6 +51,7 @@ public class Executor
     public void GenerateReport()
     {
         WorkItemTraverser workItemTraverser = new(WitClient);
+        int processedCount = 0;
 
         foreach (var workItemId in Config.WorkItemIds)
         {
@@ -62,11 +63,15 @@ public class Executor
                 var travWorkItem = WitClient.GetWorkItemAsync(travWorkItemId).Result;
                 Reporter.Add(travWorkItem);
             }));
+
+            processedCount++;
+            Console.WriteLine($"Processed {processedCount} / {Config.WorkItemIds.Count}", true);
         }
     }
 
     public void MoveWorkItems()
     {
+        int processedCount = 0;
         foreach (var workItemId in Config.WorkItemIds)
         {
             var workItem = WitClient.GetWorkItemAsync(workItemId).Result;
@@ -75,10 +80,14 @@ public class Executor
             MoveWorkItem(workItemId);
 
             // 2. Move realted WorkItem
-            if (!Config.ShouldTraverseRelations) return;
+            if (Config.ShouldTraverseRelations)
+            {
+                WorkItemTraverser workItemTraverser = new(WitClient);
+                workItemTraverser.Traverse(workItemId, new Func<int, bool>(ShouldProcess), new Action<int>(MoveWorkItem));
+            }
 
-            WorkItemTraverser workItemTraverser = new(WitClient);
-            workItemTraverser.Traverse(workItemId, new Func<int, bool>(ShouldProcess), new Action<int>(MoveWorkItem));
+            processedCount++;
+            Console.WriteLine($"Processed {processedCount} / {Config.WorkItemIds.Count}", true);
         }
     }
 

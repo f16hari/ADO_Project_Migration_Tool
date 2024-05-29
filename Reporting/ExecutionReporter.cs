@@ -1,5 +1,4 @@
 ﻿using ADOMigration.Extensions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
 namespace ADOMigration.Reporting;

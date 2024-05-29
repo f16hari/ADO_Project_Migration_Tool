@@ -8,7 +8,7 @@ var builder = new ConfigurationBuilder()
 
 var configuration = builder.Build();
 
-UserOperation operationToPerform = (UserOperation)Enum.Parse(typeof(UserOperation), configuration.GetValue<string>("Migration:OperationToPerform") ?? string.Empty);
+UserOperation operationToPerform = (UserOperation)Enum.Parse(typeof(UserOperation), configuration.GetValue<string>("Operation") ?? throw new ArgumentNullException("Operation"));
 Executor executor = new(configuration);
 
 switch (operationToPerform)
