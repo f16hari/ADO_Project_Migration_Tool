@@ -13,10 +13,6 @@
     <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="19.225.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\Migration\" />
-  </ItemGroup>
-
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
     <Copy SourceFiles="appsettings.json" DestinationFolder="$(OutDir)" />
   </Target>

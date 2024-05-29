@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
-using ADOMigration;
-using Microsoft.Extensions.DependencyInjection;
-using ADOMigration.Utilty;
+using ADOMigration.Model;
+using ADOMigration.Core;
 
 var builder = new ConfigurationBuilder()
         .SetBasePath(Directory.GetCurrentDirectory())
@@ -9,12 +8,20 @@ var builder = new ConfigurationBuilder()
 
 var configuration = builder.Build();
 
-var services = new ServiceCollection();
-services.AddSingleton<IConfiguration>(provider => configuration);
-services.AddSingleton<WorkItemFetcher, WorkItemFetcher>();
-services.AddSingleton<WorkItemMover, WorkItemMover>();
-services.AddSingleton<WorkItemRelationHelper, WorkItemRelationHelper>();
-services.AddSingleton<ILogger>(provider => new FileLogger(configuration.GetValue<string>("Logging:FilePath") ?? string.Empty));
-services.AddSingleton<MigrationService, MigrationService>();
+UserOperation operationToPerform = (UserOperation)Enum.Parse(typeof(UserOperation), configuration.GetValue<string>("Migration:OperationToPerform") ?? string.Empty);
+Executor executor = new(configuration);
 
-services.BuildServiceProvider().GetService<MigrationService>()?.Run();
+switch (operationToPerform)
+{
+        case UserOperation.MoveWorkItems:
+                executor.MoveWorkItems();
+                break;
+        case UserOperation.RollBackTo:
+                executor.RollBack();
+                break;
+        case UserOperation.GenerateReport:
+                executor.GenerateReport();
+                break;
+        default:
+                throw new InvalidOperationException();
+}
