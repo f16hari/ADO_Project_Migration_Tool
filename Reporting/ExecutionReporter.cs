@@ -12,7 +12,7 @@ public class ExecutionReporter
         FilePath = Path.Combine(reportingDirectory, $"Execution_Report_{DateTime.Now}.csv");
 
         using StreamWriter writer = File.AppendText(FilePath);
-        writer.WriteLine("workItemId, workItemType, iterationPath, areaPath");
+        writer.WriteLine("workItemId, workItemType, areaPath, iterationPath");
     }
 
     public void Add(WorkItem workItem)
@@ -20,7 +20,7 @@ public class ExecutionReporter
         try
         {
             using StreamWriter writer = File.AppendText(FilePath);
-            writer.WriteLine($"{workItem.Id}, {workItem.WorkItemType()}, {workItem.IterationPath()}, {workItem.AreaPath()}");
+            writer.WriteLine($"{workItem.Id}, {workItem.WorkItemType()}, {workItem.AreaPath()}, {workItem.IterationPath()}");
         }
         catch (Exception ex)
         {
