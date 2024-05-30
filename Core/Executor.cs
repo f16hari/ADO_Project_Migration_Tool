@@ -98,6 +98,9 @@ public class Executor
     public void MoveWorkItem(int workItemId)
     {
         var workItem = WitClient.GetWorkItemAsync(workItemId, expand: WorkItemExpand.Relations).Result;
+        
+        if(workItem.IsTestArtifact()) return;
+
         List<WorkItemRelation> removedRelations = [];
         WorkItemRelationHelper workItemRelationHelper = new(WitClient);
         WorkItemMover mover = new(WitClient);
@@ -173,7 +176,7 @@ public class Executor
         {
             RollBackHelper rollBackHelper = new(WitClient);
 
-            foreach (var line in File.ReadAllLines(Config.ReportingDirectory).Reverse())
+            foreach (var line in File.ReadAllLines(Config.RollBackFile).Reverse())
             {
                 ExecutionLogEntry logEntry = new(line);
                 if (logEntry.ExecutionStep < Config.RollBackToStep) break;
@@ -192,13 +195,21 @@ public class Executor
 
     private bool ShouldProcess(int workItemId)
     {
-        var workItem = WitClient.GetWorkItemAsync(workItemId).Result;
+        try
+        {
+            var workItem = WitClient.GetWorkItemAsync(workItemId).Result;
 
-        if (workItem.TeamProject() != Config.SourceProject
-            || Config.AreaPathsToIgnore.Contains(workItem.AreaPath())
-            || Config.IterationPathsToIgnore.Contains(workItem.IterationPath())
-            || Config.WorkItemTypesToIgnore.Contains(workItem.WorkItemType())) return false;
+            if (workItem.TeamProject() != Config.SourceProject
+            || Config.WorkItemTypesToIgnore.Contains(workItem.WorkItemType())
+            || Config.AreaPathsToIgnore.Any(x => workItem.IsEqualOrUnderAreaPath(x))
+            || Config.IterationPathsToIgnore.Any(x => workItem.IsEqualOrUnderIterationPath(x))) return false;
 
-        return true;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("does not exist, or you do not have permissions to read it.")) return false;
+            throw;
+        }
     }
 }

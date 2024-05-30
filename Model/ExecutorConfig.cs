@@ -17,6 +17,7 @@ public class ExecutorConfig(IConfiguration config)
     public bool ShouldTraverseRelations { get; set; } = config.GetValue<bool>("ShouldTraverseRelations");
     public UserOperation Operation { get; set; } = (UserOperation)Enum.Parse(typeof(UserOperation), config.GetValue<string>("Operation") ?? throw new ArgumentNullException("Operation"));
     public long? RollBackToStep { get; set; } = config.GetValue<long>("RollBackToStep");
+    public string RollBackFile { get; set; } = config.GetValue<string>("RollBackFile") ?? string.Empty;
     public string ReportingDirectory { get; set; } = config.GetValue<string>("ReportingDirectory") ?? throw new ArgumentNullException("ReportingDirectory");
     public string LoggingDirectory { get; set; } = config.GetValue<string>("LoggingDirectory") ?? throw new ArgumentNullException("LoggingDirectory");
 }

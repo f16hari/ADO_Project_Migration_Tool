@@ -5,19 +5,22 @@ namespace ADOMigration.Utilty;
 
 public class WorkItemTraverser(WorkItemTrackingHttpClient witClient)
 {
+    public HashSet<int> VisitedWorkItems { get; set; } = [];
+
     public void Traverse(int workItemId, Func<int, bool> shouldProcess, Action<int> callBack)
     {
         try
         {
+            VisitedWorkItems.Add(workItemId);
             var workItem = witClient.GetWorkItemAsync(workItemId, expand: WorkItemExpand.Relations).Result;
 
-            if(workItem.Relations == null) return;
-            
+            if (workItem.Relations == null) return;
+
             foreach (var relatedWorkItem in workItem.Relations)
             {
-                var relatedWorkItemId = int.Parse(relatedWorkItem.Url.Split('/').Last());
-
-                if(!shouldProcess(relatedWorkItemId)) return;
+                if (!int.TryParse(relatedWorkItem.Url.Split('/').Last(), out var relatedWorkItemId)
+                    || VisitedWorkItems.Contains(relatedWorkItemId)
+                    || !shouldProcess(relatedWorkItemId)) continue;
 
                 callBack.Invoke(relatedWorkItemId);
                 Traverse(relatedWorkItemId, shouldProcess, callBack);

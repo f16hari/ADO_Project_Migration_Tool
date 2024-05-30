@@ -30,4 +30,24 @@ public static class WorkItemExtension
 
         return workItemType == "Test Cause" || workItemType == "Test Suite" || workItemType == "Test Plan";
     }
+
+    public static bool IsEqualOrUnderAreaPath(this WorkItem workItem, string areaPath)
+    {
+        if (areaPath.EndsWith('*'))
+        {
+            return workItem.AreaPath().StartsWith(areaPath.Remove(areaPath.Length - 1));
+        }
+
+        return workItem.AreaPath() == areaPath;
+    }
+
+    public static bool IsEqualOrUnderIterationPath(this WorkItem workItem, string iterationPath)
+    {
+        if (iterationPath.EndsWith('*'))
+        {
+            return workItem.IterationPath().StartsWith(iterationPath.Remove(iterationPath.Length - 1));
+        }
+
+        return workItem.IterationPath() == iterationPath;
+    }
 }
