@@ -15,8 +15,8 @@ public class WorkItemRelationHelper(WorkItemTrackingHttpClient witclient)
             List<WorkItemRelation> removedRelations = [];
             var workItem = witclient.GetWorkItemAsync(workItemId, expand: WorkItemExpand.Relations).Result;
 
-            if(workItem.Relations == null) return removedRelations;
-            
+            if (workItem.Relations == null) return removedRelations;
+
             int currentIndex = -1;
             foreach (var relation in workItem.Relations)
             {

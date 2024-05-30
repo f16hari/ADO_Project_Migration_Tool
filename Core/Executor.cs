@@ -56,8 +56,8 @@ public class Executor
         foreach (var workItemId in Config.WorkItemIds)
         {
             var workItem = WitClient.GetWorkItemAsync(workItemId).Result;
-            
-            if(workItemTraverser.VisitedWorkItems.Contains(workItemId)) continue;
+
+            if (workItemTraverser.VisitedWorkItems.Contains(workItemId)) continue;
             Reporter.Add(workItem);
 
             if (Config.ShouldTraverseRelations)
@@ -81,7 +81,7 @@ public class Executor
 
         foreach (var workItemId in Config.WorkItemIds)
         {
-            if(workItemTraverser.VisitedWorkItems.Contains(workItemId)) continue;
+            if (workItemTraverser.VisitedWorkItems.Contains(workItemId)) continue;
 
             var workItem = WitClient.GetWorkItemAsync(workItemId).Result;
 
@@ -102,8 +102,8 @@ public class Executor
     public void MoveWorkItem(int workItemId)
     {
         var workItem = WitClient.GetWorkItemAsync(workItemId, expand: WorkItemExpand.Relations).Result;
-        
-        if(workItem.IsTestArtifact()) return;
+
+        if (workItem.IsTestArtifact()) return;
 
         List<WorkItemRelation> removedRelations = [];
         WorkItemRelationHelper workItemRelationHelper = new(WitClient);
@@ -115,20 +115,19 @@ public class Executor
             removedRelations = workItemRelationHelper.RemoveTestArtifactRelations(workItemId);
             ExecutionLogger.Log(workItem,
                                 SystemOperation.RemoveTestArtifacts,
-                                Newtonsoft.Json.JsonConvert.SerializeObject(workItem.Relations) ?? string.Empty,
-                                Newtonsoft.Json.JsonConvert.SerializeObject(removedRelations) ?? string.Empty,
+                                Newtonsoft.Json.JsonConvert.SerializeObject(removedRelations),
+                                "[]",
                                 OperationStatus.Completed);
         }
         catch
         {
             ExecutionLogger.Log(workItem,
                                 SystemOperation.RemoveTestArtifacts,
-                                Newtonsoft.Json.JsonConvert.SerializeObject(workItem.Relations) ?? string.Empty,
-                                string.Empty,
+                                Newtonsoft.Json.JsonConvert.SerializeObject(workItem.Relations ?? []),
+                                "[]",
                                 OperationStatus.Failed);
             throw;
         }
-
 
         // 2. Move WorkItem
         try
@@ -136,20 +135,19 @@ public class Executor
             var movedWorkItem = mover.MoveWorkItem(workItemId, Config.SourceProject, Config.DestinationProject);
             ExecutionLogger.Log(workItem,
                                 SystemOperation.MoveWorkItem,
-                                $"{workItem.TeamProject()};{workItem.AreaPath()};{workItem.IterationPath}",
-                                $"{movedWorkItem.TeamProject()};{movedWorkItem.AreaPath()};{movedWorkItem.IterationPath}",
+                                $"{workItem.TeamProject()};{workItem.AreaPath()};{workItem.IterationPath()}",
+                                $"{movedWorkItem.TeamProject()};{movedWorkItem.AreaPath()};{movedWorkItem.IterationPath()}",
                                 OperationStatus.Completed);
         }
         catch
         {
             ExecutionLogger.Log(workItem,
                                 SystemOperation.MoveWorkItem,
-                                $"{workItem.TeamProject()};{workItem.AreaPath()};{workItem.IterationPath}",
+                                $"{workItem.TeamProject()};{workItem.AreaPath()};{workItem.IterationPath()}",
                                 string.Empty,
                                 OperationStatus.Failed);
             throw;
         }
-
 
         // 3. Restore the Test Artifact links
         try
@@ -183,7 +181,7 @@ public class Executor
             foreach (var line in File.ReadAllLines(Config.RollBackFile).Reverse())
             {
                 ExecutionLogEntry logEntry = new(line);
-                if (logEntry.ExecutionStep < Config.RollBackToStep) break;
+                if (logEntry.ExecutionStep <= Config.RollBackToStep) break;
 
                 rollBackHelper.RollBack(logEntry.WorkItemId, logEntry.Operation, logEntry.PrevValue);
             }

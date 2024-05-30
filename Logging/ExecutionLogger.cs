@@ -23,8 +23,8 @@ public class ExecutionLogger
         {
             using StreamWriter writer = File.AppendText(FilePath);
 
-            ExecutionStep++;
             ExecutionLogEntry entry = new(ExecutionStep, workItem, operation, prevValue, newValue, status);
+            ExecutionStep++;
 
             writer.WriteLine(entry.ToCsv());
         }

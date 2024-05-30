@@ -28,7 +28,7 @@ public static class WorkItemExtension
     {
         var workItemType = workItem.WorkItemType();
 
-        return workItemType == "Test Cause" || workItemType == "Test Suite" || workItemType == "Test Plan";
+        return workItemType == "Test Case" || workItemType == "Test Suite" || workItemType == "Test Plan";
     }
 
     public static bool IsEqualOrUnderAreaPath(this WorkItem workItem, string areaPath)

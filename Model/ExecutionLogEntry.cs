@@ -39,6 +39,6 @@ public class ExecutionLogEntry
 
     public string ToCsv()
     {
-        return $"{ExecutionStep}, {WorkItemId}, {WorkItemType}, {Operation.Description()}, {PrevValue}, {NewValue}, {Status}";
+        return $"{ExecutionStep}, {WorkItemId}, {WorkItemType}, {Operation}, {PrevValue}, {NewValue}, {Status}";
     }
 }

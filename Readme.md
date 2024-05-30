@@ -9,7 +9,7 @@
 1. Get the tool build contents.
 2. Verify if it contains **ADOMigration.exe** and **appsettings.json** along with other dlls.
 3. Open the cmd prompt in the same location as of the tool
-4. Verify if .net 8 is installed in the environment where the tool will be run on or else install it from `[text](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)`
+4. Verify if .net 8 is installed in the environment where the tool will be run on or else install it from [.Net 8 Download](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) In this link look for the latest SDK and download based on you processor architecture and OS (x64 or x86 etc).
 
 ## Operations Supported
 1. Move work items to a different team project
@@ -31,14 +31,14 @@
 1. Configure the appsettings with value of **Operation** key to be **GenerateReport** along with other general configurations like **OrgURL** and **PersonalAccessToken** which you can get the ADO.
 2. Setting the value of **ShouldTraverseRelations** to true will allow the tool to report work items specified through **WorkItemIds** property along with their related link as well.
 3. **AreaPathsToIgnore, IterationPathsToIgnore, WorkItemTypesToIgnore** are array of string properties which can be used to skip work items that end up for related links but are not to be reported.
-4. Now to execute in the cmd opened just type **ADMigration** and press enter.
-5. Having **ReportingDirectory** is mandatory as here is where the report with work items to be migrated will be stored.
+4. Having **ReportingDirectory** is mandatory as here is where the report with work items to be migrated will be stored.
+5. Now to execute in the cmd opened just type **ADMigration** and press enter.
 
 ## Steps for : Rollback
 
-1. Configure the appsettings with value of **Operation** key to be **MoveWorkItems** along with other general configurations like **OrgURL** and **PersonalAccessToken** which you can get the ADO.
+1. Configure the appsettings with value of **Operation** key to be **RollBackTo** along with other general configurations like **OrgURL** and **PersonalAccessToken** which you can get the ADO.
 2. Configure **RollBackFile** which will be the Execution Log file generated while moving work item and **RollBackToStep** to nudge the tool to roll back up to particular step based on the execution log file.
-4. Now to execute in the cmd opened just type **ADMigration** and press enter.
+3. Now to execute in the cmd opened just type **ADMigration** and press enter.
 
 ## Things to keep in mind
 - ADO has api rate limiter so its better to perform required operation on few hundered first -> verify those -> move to the next set with some cooldown time.
