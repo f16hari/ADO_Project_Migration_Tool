@@ -7,8 +7,9 @@
 
 ## Prerequisites
 1. Get the tool build contents.
-2. Verify if it contains **ADOMigration.exe** and **appsettings.exe** along with other dlls.
+2. Verify if it contains **ADOMigration.exe** and **appsettings.json** along with other dlls.
 3. Open the cmd prompt in the same location as of the tool
+4. Verify if .net 8 is installed in the environment where the tool will be run on or else install it from `[text](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)`
 
 ## Operations Supported
 1. Move work items to a different team project
@@ -20,9 +21,9 @@
 1. Configure the appsettings with value of **Operation** key to be **MoveWorkItems** along with other general configurations like **OrgURL** and **PersonalAccessToken** which you can get the ADO.
 2. Setting the value of **ShouldTraverseRelations** to true will allow the tool to move work items specified through **WorkItemIds** property along with their related link as well.
 3. **AreaPathsToIgnore, IterationPathsToIgnore, WorkItemTypesToIgnore** are array of string properties which can be used to skip work items that end up for related links but are not to be migrated. Note: If all paths under a particular area or iteration path are to be ignored add a `*` in the end e.g. A/B* which will ignore paths like A/B/C or A/B/C/D etc.
-4. Now to execute in the cmd opened just type **ADMigration** and press enter.
-5. Having **LoggingDirectory** is mandatory as here is where the Execution history will be stored which will be later used for Rollback.
-6. By default work items that are not from the **SourceProject** will not be moved.
+4. Having **LoggingDirectory** is mandatory as here is where the Execution history will be stored which will be later used for Rollback.
+5. By default work items that are not from the **SourceProject** will not be moved.
+6. Now to execute in the cmd opened just type **ADMigration** and press enter.
 
 
 ## Steps for : Reporting

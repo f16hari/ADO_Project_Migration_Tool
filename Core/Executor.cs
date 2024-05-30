@@ -82,7 +82,7 @@ public class Executor
         foreach (var workItemId in Config.WorkItemIds)
         {
             if(workItemTraverser.VisitedWorkItems.Contains(workItemId)) continue;
-            
+
             var workItem = WitClient.GetWorkItemAsync(workItemId).Result;
 
             // 1. Move WorkItem
