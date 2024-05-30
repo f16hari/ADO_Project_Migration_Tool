@@ -56,6 +56,8 @@ public class Executor
         foreach (var workItemId in Config.WorkItemIds)
         {
             var workItem = WitClient.GetWorkItemAsync(workItemId).Result;
+            
+            if(workItemTraverser.VisitedWorkItems.Contains(workItemId)) continue;
             Reporter.Add(workItem);
 
             if (Config.ShouldTraverseRelations)
@@ -79,6 +81,8 @@ public class Executor
 
         foreach (var workItemId in Config.WorkItemIds)
         {
+            if(workItemTraverser.VisitedWorkItems.Contains(workItemId)) continue;
+            
             var workItem = WitClient.GetWorkItemAsync(workItemId).Result;
 
             // 1. Move WorkItem
