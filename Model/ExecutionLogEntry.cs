@@ -9,7 +9,7 @@ public class ExecutionLogEntry
     public long ExecutionStep { get; set; }
     public int WorkItemId { get; set; }
     public string WorkItemType { get; set; }
-    public SystemOperation Operation { get; set; }  
+    public SystemOperation Operation { get; set; }
     public string PrevValue { get; set; }
     public string NewValue { get; set; }
     public OperationStatus Status { get; set; }
@@ -18,15 +18,16 @@ public class ExecutionLogEntry
     {
         ExecutionStep = executionStep;
         WorkItemId = workItem.Id ?? 0;
-        WorkItemType = workItem.WorkItemType();
+        WorkItemType = workItem.Type();
         Operation = operation;
         PrevValue = prevValue;
         NewValue = newValue;
+        Status = status;
     }
 
-    public ExecutionLogEntry(string logEntry)
+    public ExecutionLogEntry(string logEntry, string delimeter = ",")
     {
-        var splits = logEntry.Split(',');
+        var splits = logEntry.Split(delimeter);
 
         ExecutionStep = long.Parse(splits[0]);
         WorkItemId = int.Parse(splits[1]);
@@ -37,8 +38,8 @@ public class ExecutionLogEntry
         Status = (OperationStatus)Enum.Parse(typeof(OperationStatus), splits[6]);
     }
 
-    public string ToCsv()
+    public string ToCsv(string delimeter = ",")
     {
-        return $"{ExecutionStep}, {WorkItemId}, {WorkItemType}, {Operation}, {PrevValue}, {NewValue}, {Status}";
+        return $"{ExecutionStep}{delimeter}{WorkItemId}{delimeter}{WorkItemType}{delimeter}{Operation}{delimeter}{PrevValue}{delimeter}{NewValue}{delimeter}{Status}";
     }
 }

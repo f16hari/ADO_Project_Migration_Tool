@@ -104,11 +104,9 @@ public class Executor
         var workItem = WitClient.GetWorkItemAsync(workItemId, expand: WorkItemExpand.Relations).Result;
 
         if (workItem.IsTestArtifact()) return;
-
-        List<WorkItemRelation> removedRelations = [];
         WorkItemRelationHelper workItemRelationHelper = new(WitClient);
         WorkItemMover mover = new(WitClient);
-
+        List<WorkItemRelation> removedRelations;
         // 1. Remove Test Aritifact links
         try
         {
@@ -132,18 +130,20 @@ public class Executor
         // 2. Move WorkItem
         try
         {
-            var movedWorkItem = mover.MoveWorkItem(workItemId, Config.SourceProject, Config.DestinationProject);
+            Config.StateMaps.TryGetValue($"{workItem.Type()};{workItem.State()}", out var newState);
+            var movedWorkItem = mover.MoveWorkItem(workItemId, Config.SourceProject, Config.DestinationProject, newState: newState);
+
             ExecutionLogger.Log(workItem,
                                 SystemOperation.MoveWorkItem,
-                                $"{workItem.TeamProject()};{workItem.AreaPath()};{workItem.IterationPath()}",
-                                $"{movedWorkItem.TeamProject()};{movedWorkItem.AreaPath()};{movedWorkItem.IterationPath()}",
+                                $"{workItem.TeamProject()};{workItem.AreaPath()};{workItem.IterationPath()};{workItem.State()}",
+                                $"{movedWorkItem.TeamProject()};{movedWorkItem.AreaPath()};{movedWorkItem.IterationPath()};{movedWorkItem.State()}",
                                 OperationStatus.Completed);
         }
         catch
         {
             ExecutionLogger.Log(workItem,
                                 SystemOperation.MoveWorkItem,
-                                $"{workItem.TeamProject()};{workItem.AreaPath()};{workItem.IterationPath()}",
+                                $"{workItem.TeamProject()};{workItem.AreaPath()};{workItem.IterationPath()};{workItem.State()}",
                                 string.Empty,
                                 OperationStatus.Failed);
             throw;
@@ -178,9 +178,9 @@ public class Executor
         {
             RollBackHelper rollBackHelper = new(WitClient);
 
-            foreach (var line in File.ReadAllLines(Config.RollBackFile).Reverse())
+            foreach (var line in File.ReadAllLines(Config.RollBackFile).Reverse().SkipLast(1))
             {
-                ExecutionLogEntry logEntry = new(line);
+                ExecutionLogEntry logEntry = new(line, "`");
                 if (logEntry.ExecutionStep <= Config.RollBackToStep) break;
 
                 rollBackHelper.RollBack(logEntry.WorkItemId, logEntry.Operation, logEntry.PrevValue);
@@ -202,7 +202,7 @@ public class Executor
             var workItem = WitClient.GetWorkItemAsync(workItemId).Result;
 
             if (workItem.TeamProject() != Config.SourceProject
-            || Config.WorkItemTypesToIgnore.Contains(workItem.WorkItemType())
+            || Config.WorkItemTypesToIgnore.Contains(workItem.Type())
             || Config.AreaPathsToIgnore.Any(x => workItem.IsEqualOrUnderAreaPath(x))
             || Config.IterationPathsToIgnore.Any(x => workItem.IsEqualOrUnderIterationPath(x))) return false;
 

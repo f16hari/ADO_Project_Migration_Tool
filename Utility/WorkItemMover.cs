@@ -1,4 +1,5 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
+﻿using Microsoft.TeamFoundation.Common;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 
@@ -8,7 +9,7 @@ public class WorkItemMover(WorkItemTrackingHttpClient witClient)
 {
     private ClassificationNodeHelper ClassificationNodeHelper { get; } = new ClassificationNodeHelper(witClient);
 
-    public WorkItem MoveWorkItem(int workItemId, string sourceProject, string destinationProject, string? destAreaPath = null, string? destIterationPath = null)
+    public WorkItem MoveWorkItem(int workItemId, string sourceProject, string destinationProject, string? destAreaPath = null, string? destIterationPath = null, string? newState = null)
     {
         try
         {
@@ -37,7 +38,17 @@ public class WorkItemMover(WorkItemTrackingHttpClient witClient)
                 },
             ];
 
-            return witClient.UpdateWorkItemAsync(jsonPatchDocument, workItemId).Result;
+            if (!newState.IsNullOrEmpty())
+            {
+                jsonPatchDocument.Add(new JsonPatchOperation()
+                {
+                    Operation = Microsoft.VisualStudio.Services.WebApi.Patch.Operation.Replace,
+                    Path = "/fields/System.State",
+                    Value = newState
+                });
+            }
+
+            return witClient.UpdateWorkItemAsync(jsonPatchDocument, workItemId, bypassRules: true).Result;
         }
         catch (Exception ex)
         {

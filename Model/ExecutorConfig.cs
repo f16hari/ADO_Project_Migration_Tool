@@ -11,6 +11,7 @@ public class ExecutorConfig(IConfiguration config)
     public string DestinationProject { get; set; } = config.GetValue<string>("DestinationProject") ?? throw new ArgumentNullException("DestinationProject");
     public List<int> WorkItemIds { get; set; } = config.GetSection("WorkItemIds").Get<List<int>>() ?? [];
     public string WITQuery { get; set; } = config.GetValue<string>("WITQuery") ?? string.Empty;
+    public Dictionary<string, string> StateMaps { get; set; } = config.GetSection("StateMaps").GetChildren().ToDictionary(x => x.Key, x => x.Value ?? string.Empty);
     public List<string> AreaPathsToIgnore { get; set; } = config.GetSection("AreaPathsToIgnore").Get<List<string>>() ?? [];
     public List<string> IterationPathsToIgnore { get; set; } = config.GetSection("IterationPathsToIgnore").Get<List<string>>() ?? [];
     public List<string> WorkItemTypesToIgnore { get; set; } = config.GetSection("WorkItemTypesToIgnore").Get<List<string>>() ?? [];

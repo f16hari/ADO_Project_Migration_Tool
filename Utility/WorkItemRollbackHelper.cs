@@ -29,9 +29,16 @@ public class RollBackHelper(WorkItemTrackingHttpClient witclient)
                 var prevTeamProject = splits[0];
                 var prevAreaPath = splits[1];
                 var prevIterationPath = splits[2];
+                var prevState = splits[3];   
 
                 WorkItemMover workItemMover = new(witclient);
-                workItemMover.MoveWorkItem(workItemId, workItem.TeamProject(), prevTeamProject, prevAreaPath, prevIterationPath);
+                workItemMover.MoveWorkItem(workItemId, workItem.TeamProject(), prevTeamProject, prevAreaPath, prevIterationPath, prevState);
+            }
+
+            else if(operation == SystemOperation.RestoringTestArtifactLinks)
+            {
+                WorkItemRelationHelper workItemRelationHelper = new(witclient);
+                workItemRelationHelper.RemoveTestArtifactRelations(workItemId);
             }
         }
         catch (Exception ex)

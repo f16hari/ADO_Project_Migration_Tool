@@ -7,14 +7,15 @@ public class ExecutionLogger
 {
     private string FilePath { get; }
     private long ExecutionStep { get; set; }
+    private string delimeter { get; set; } = "`";
 
     public ExecutionLogger(string loggingDirectory, long executinStep = 1)
     {
-        FilePath = Path.Combine(loggingDirectory, $"Execution_Logs_{DateTime.Now:ddMMyyyyHHMMss}.csv");
+        FilePath = Path.Combine(loggingDirectory, $"Execution_Logs_{DateTime.Now:ddMMyyyyHHMMss}.txt");
         ExecutionStep = executinStep;
 
         using StreamWriter writer = File.AppendText(FilePath);
-        writer.WriteLine("executionStep, workItemId, workItemType, operation, prevValue, newValue, status");
+        writer.WriteLine($"executionStep{delimeter}workItemId{delimeter}workItemType{delimeter}operation{delimeter}prevValue{delimeter}newValue{delimeter}status");
     }
 
     public void Log(WorkItem workItem, SystemOperation operation, string prevValue, string newValue, OperationStatus status)
@@ -26,7 +27,7 @@ public class ExecutionLogger
             ExecutionLogEntry entry = new(ExecutionStep, workItem, operation, prevValue, newValue, status);
             ExecutionStep++;
 
-            writer.WriteLine(entry.ToCsv());
+            writer.WriteLine(entry.ToCsv(delimeter));
         }
         catch (Exception ex)
         {

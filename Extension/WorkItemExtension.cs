@@ -4,9 +4,14 @@ namespace ADOMigration.Extensions;
 
 public static class WorkItemExtension
 {
-    public static string WorkItemType(this WorkItem workItem)
+    public static string Type(this WorkItem workItem)
     {
         return workItem.Fields.First(x => x.Key == "System.WorkItemType").Value.ToString() ?? string.Empty;
+    }
+
+    public static string State(this WorkItem workItem)
+    {
+        return workItem.Fields.First(x => x.Key == "System.State").Value.ToString() ?? string.Empty;
     }
 
     public static string TeamProject(this WorkItem workItem)
@@ -26,7 +31,7 @@ public static class WorkItemExtension
 
     public static bool IsTestArtifact(this WorkItem workItem)
     {
-        var workItemType = workItem.WorkItemType();
+        var workItemType = workItem.Type();
 
         return workItemType == "Test Case" || workItemType == "Test Suite" || workItemType == "Test Plan";
     }

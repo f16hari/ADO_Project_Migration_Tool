@@ -22,7 +22,9 @@ public class WorkItemRelationHelper(WorkItemTrackingHttpClient witclient)
             {
                 currentIndex++;
 
-                WorkItem relatedWorkItem = witclient.GetWorkItemAsync(int.Parse(relation.Url.Split('/').Last())).Result;
+                if(!int.TryParse(relation.Url.Split('/').Last(), out var relatedWorkItemId)) continue;
+
+                WorkItem relatedWorkItem = witclient.GetWorkItemAsync(relatedWorkItemId).Result;
                 if (!relatedWorkItem.IsTestArtifact()) continue;
 
                 patchDocument.Add(new JsonPatchOperation()

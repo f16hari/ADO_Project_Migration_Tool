@@ -20,7 +20,7 @@ public class ExecutionReporter
         try
         {
             using StreamWriter writer = File.AppendText(FilePath);
-            writer.WriteLine($"{workItem.Id}, {workItem.WorkItemType()}, {workItem.AreaPath()}, {workItem.IterationPath()}");
+            writer.WriteLine($"{workItem.Id}, {workItem.Type()}, {workItem.AreaPath()}, {workItem.IterationPath()}");
         }
         catch (Exception ex)
         {
