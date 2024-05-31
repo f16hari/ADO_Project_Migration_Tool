@@ -20,9 +20,10 @@
 
 1. Configure the appsettings with value of **Operation** key to be **MoveWorkItems** along with other general configurations like **OrgURL** and **PersonalAccessToken** which you can get the ADO.
 2. Setting the value of **ShouldTraverseRelations** to true will allow the tool to move work items specified through **WorkItemIds** property along with their related link as well.
-3. **AreaPathsToIgnore, IterationPathsToIgnore, WorkItemTypesToIgnore** are array of string properties which can be used to skip work items that end up for related links but are not to be migrated. Note: If all paths under a particular area or iteration path are to be ignored add a `*` in the end e.g. A/B* which will ignore paths like A/B/C or A/B/C/D etc.
+3. **AreaPathsToIgnore, IterationPathsToIgnore, WorkItemTypesToIgnore** are array of string properties which can be used to skip work items that end up for related links but are not to be migrated. Note: If all paths under a particular area or iteration path are to be ignored add a `*` in the end e.g. `A/B*` which will ignore paths like `A/B/C` or `A/B/C/D` etc.
 4. Having **LoggingDirectory** is mandatory as here is where the Execution history will be stored which will be later used for Rollback.
 5. By default work items that are not from the **SourceProject** will not be moved.
+6. **StateMaps** can be use to add what state the workitem should take when moving from source to target. the StateMap is an array where the format for each entry should be like `"<Source WorkItemType>;<Source State>" : "<Destination State>"`
 6. Now to execute in the cmd opened just type **ADMigration** and press enter.
 
 
@@ -53,6 +54,7 @@
     "DestinationProject": "Target",
     "WorkItemIds": [],
     "WITQuery": "",
+    "StateMaps": [],
     "AreaPathsToIgnore": [],
     "IterationPathsToIgnore": [],
     "WorkItemTypesToIgnore": [],
