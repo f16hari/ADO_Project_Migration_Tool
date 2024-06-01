@@ -131,7 +131,9 @@ public class Executor
         try
         {
             Config.StateMaps.TryGetValue($"{workItem.Type()};{workItem.State()}", out var newState);
-            var movedWorkItem = mover.MoveWorkItem(workItemId, Config.SourceProject, Config.DestinationProject, newState: newState);
+            Config.AreaPathMaps.TryGetValue(workItem.AreaPath(), out var destAreaPath);
+            Config.AreaPathMaps.TryGetValue(workItem.IterationPath(), out var destIterationPath);
+            var movedWorkItem = mover.MoveWorkItem(workItemId, Config.SourceProject, Config.DestinationProject, destAreaPath, destIterationPath, newState: newState);
 
             ExecutionLogger.Log(workItem,
                                 SystemOperation.MoveWorkItem,

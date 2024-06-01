@@ -1,17 +1,19 @@
 # Things to understand before moving workitems accross the pojects
 
-- Work items can be moved to a new team project only within the same organization.
-- Work items having test artifact relations (Test Case, Test Suites, Test Plans) cannot be moved.
+-   Work items can be moved to a new team project only within the same organization.
+-   Work items having test artifact relations (Test Case, Test Suites, Test Plans) cannot be moved.
 
 # Process involved in moving work items accross projects
 
 ## Prerequisites
+
 1. Get the tool build contents.
 2. Verify if it contains **ADOMigration.exe** and **appsettings.json** along with other dlls.
 3. Open the cmd prompt in the same location as of the tool
 4. Verify if .net 8 is installed in the environment where the tool will be run on or else install it from [.Net 8 Download](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) In this link look for the latest SDK and download based on you processor architecture and OS (x64 or x86 etc).
 
 ## Operations Supported
+
 1. Move work items to a different team project
 2. Report of all the items to be moved
 3. Rollback the operations performed
@@ -24,8 +26,8 @@
 4. Having **LoggingDirectory** is mandatory as here is where the Execution history will be stored which will be later used for Rollback.
 5. By default work items that are not from the **SourceProject** will not be moved.
 6. **StateMaps** can be use to add what state the workitem should take when moving from source to target. the StateMap is an array where the format for each entry should be like `"<Source WorkItemType>;<Source State>" : "<Destination State>"`
-6. Now to execute in the cmd opened just type **ADMigration** and press enter.
-
+7. **AreaPathMaps** and **IterationPathMaps** can be used to map area and iterations when moving items from source to destination. e.g. `"<Source Area / Iteration Path>" : "<Destination Area / Iteration Path>"`
+7. Now to execute in the cmd opened just type **ADMigration** and press enter.
 
 ## Steps for : Reporting
 
@@ -42,10 +44,12 @@
 3. Now to execute in the cmd opened just type **ADMigration** and press enter.
 
 ## Things to keep in mind
-- ADO has api rate limiter so its better to perform required operation on few hundered first -> verify those -> move to the next set with some cooldown time.
-- If lets say something goes wrong in the middle of moving a work item, use the Rollback operation to roll back the step done till now for that workitem and the again re run the migration. For performance work items already migrated can be removed from the **WorkItemIds**.
+
+-   ADO has api rate limiter so its better to perform required operation on few hundered first -> verify those -> move to the next set with some cooldown time.
+-   If lets say something goes wrong in the middle of moving a work item, use the Rollback operation to roll back the step done till now for that workitem and the again re run the migration. For performance work items already migrated can be removed from the **WorkItemIds**.
 
 ## appsettings.json Template
+
 ```json
 {
     "OrgURL": "<Your organisation url>",
@@ -54,12 +58,14 @@
     "DestinationProject": "Target",
     "WorkItemIds": [],
     "WITQuery": "",
-    "StateMaps": [],
+    "StateMaps": {},
+    "AreaPathMaps": {},
+    "IterationPathMaps": {},
     "AreaPathsToIgnore": [],
     "IterationPathsToIgnore": [],
     "WorkItemTypesToIgnore": [],
     "ShouldTraverseRelations": false,
-    "Operation": "<Can be MoveWorkItems | GenerateReport | RollBackTo>",
+    "Operation": "Can be <MoveWorkItems | GenerateReport | RollBackTo>",
     "RollBackToStep": 0,
     "RollBackFile": "",
     "LoggingDirectory": "",
