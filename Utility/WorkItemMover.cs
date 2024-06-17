@@ -17,8 +17,8 @@ public class WorkItemMover(WorkItemTrackingHttpClient witClient)
             var destinationAreaPath = destAreaPath ?? workItem.Fields.First(x => x.Key == "System.AreaPath").Value.ToString()?.Replace(sourceProject, destinationProject) ?? string.Empty;
             var destinationIterationPath = destIterationPath ?? workItem.Fields.First(x => x.Key == "System.IterationPath").Value.ToString()?.Replace(sourceProject, destinationProject) ?? string.Empty;
 
-            ClassificationNodeHelper.CreateOrUpdateNode(destinationProject, destinationAreaPath.Replace($"{destinationProject}\\", ""), TreeStructureGroup.Areas);
-            ClassificationNodeHelper.CreateOrUpdateNode(destinationProject, destinationIterationPath.Replace($"{destinationProject}\\", ""), TreeStructureGroup.Iterations);
+            ClassificationNodeHelper.CreateOrUpdateNode(destinationProject, destinationAreaPath.ReplaceFirst($"{destinationProject}\\", ""), TreeStructureGroup.Areas);
+            ClassificationNodeHelper.CreateOrUpdateNode(destinationProject, destinationIterationPath.ReplaceFirst($"{destinationProject}\\", ""), TreeStructureGroup.Iterations);
 
             JsonPatchDocument jsonPatchDocument = [
                 new JsonPatchOperation() {
