@@ -1,7 +1,7 @@
 # Things to understand before moving workitems accross the pojects
 
 -   Work items can be moved to a new team project only within the same organization.
--   Work items having test artifact relations (Test Case, Test Suites, Test Plans) cannot be moved.
+-   Work items having test artifact relations (Test Case, Test Suites, Test Plans) cannot be moved directly. So to move them first the links to the test articfacts are removed then read linked after the workitem is removed.
 
 # Process involved in moving work items accross projects
 
